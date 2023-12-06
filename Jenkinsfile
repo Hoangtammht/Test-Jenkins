@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     tools { 
-        maven 'my-maven' 
+        maven 'springboot-maven'
     }
 
     stages {
