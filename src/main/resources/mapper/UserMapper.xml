@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.UserMapper">
+
+    <select id="findUserByPhoneNumber" resultType="com.eparking.eparking.domain.User">
+        SELECT
+            userID,
+            phoneNumber,
+            password,
+            fullName,
+            email,
+            identifyCard,
+            balance,
+            userstatus
+        FROM User
+        where phoneNumber = #{phoneNumber};
+    </select>
+
+    <select id="findResponseUserByPhone" resultType="com.eparking.eparking.domain.response.ResponseUser">
+        SELECT
+            userID,
+            User.phoneNumber,
+            fullName,
+            email,
+            identifyCard,
+            balance,
+            userstatus
+        FROM User
+        WHERE User.phoneNumber = #{phoneNumber}
+    </select>
+    <update id="updateStatusUser" parameterType="com.eparking.eparking.domain.User">
+        UPDATE User
+        SET userstatus = #{userstatus}
+        WHERE userID = #{userID}
+    </update>
+    <select id="findResponseUserRegisterByUserID" resultType="com.eparking.eparking.domain.response.ResponseUserRegister">
+        SELECT
+        userID,
+        User.phoneNumber,
+        fullName,
+        email,
+        identifyCard,
+        balance,
+        FROM User
+        WHERE User.userID = #{userID}
+    </select>
+
+    <update id="updateUserByUserID" parameterType = "com.eparking.eparking.domain.resquest.UpdateUser" >
+        UPDATE User
+        SET
+            fullName = #{updateUser.fullName},
+            identifyCard = #{updateUser.identifyCard},
+            password = #{updateUser.password},
+            phoneNumber = #{updateUser.phoneNumber}
+        WHERE userID = #{userID};
+    </update>
+
+    <insert id="createSupplier" parameterType="com.eparking.eparking.domain.resquest.RequestCreateUser" >
+        Insert into User (phoneNumber, password, fullName,identifyCard,balance,userstatus)
+        values (#{user.phoneNumber},#{user.password},#{user.fullName},#{user.identifyCard},#{user.balance},#{userstatus})
+    </insert>
+
+    <update id="updateWalletForUser" parameterType="com.eparking.eparking.domain.User">
+        UPDATE User
+        SET balance = #{balance}
+        WHERE userID = #{userID}
+    </update>
+    <select id="findUserByUserID" parameterType="java.lang.Integer" resultType="com.eparking.eparking.domain.User">
+        SELECT
+            userID,
+            phoneNumber,
+            fullName,
+            email,
+            identifyCard,
+            balance
+        FROM User
+        WHERE userID = #{userID}
+    </select>
+    <update id="updatePassword" parameterType="com.eparking.eparking.domain.User">
+        UPDATE User
+        SET password = #{password}
+        WHERE userID = #{userID}
+    </update>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.RoleMapper">
+
+    <select id="findRoleByPhoneNumber" resultType="com.eparking.eparking.domain.UserRole">
+        SELECT
+            Role.roleName,
+            User.phoneNumber
+        FROM UserRole, Role, User
+            Where UserRole.roleID = Role.roleID and
+            UserRole.userID = User.userID and
+            User.phoneNumber =  #{phoneNumber}
+    </select>
+
+    <insert id="insertUserRole" parameterType="com.eparking.eparking.domain.UserRole" >
+        Insert into UserRole (roleID, userID)
+        values (#{roleID},#{userID})
+    </insert>
+
+    <select id="findRoleIDForUser" resultType="boolean">
+        SELECT Role.roleID, Role.roleName
+        FROM User
+        INNER JOIN UserRole ON User.userID = UserRole.userID
+        INNER JOIN Role ON Role.roleID = UserRole.roleID
+        WHERE UserRole.roleID = 1
+        AND User.phoneNumber = #{phoneNumber};
+    </select>
+
+    <select id="findRoleForUser" resultType="com.eparking.eparking.domain.Role">
+        SELECT R.roleID, R.roleName
+        FROM UserRole,Role R
+        WHERE UserRole.userID = #{userID}
+        AND UserRole.roleID = R.roleID
+    </select>
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.ReservationMapper">
+
+    <select id="getReservationDetailByReservationID" resultType="com.eparking.eparking.domain.Reservation">
+        SELECT
+        reserveID,
+        userID,
+        parkingID,
+        statusID,
+        carID,
+        startDateTime,
+        endDatetime
+        FROM Reservation
+        where reserveID = #{reserveID}
+    </select>
+
+    <select id="getListOrderByUserAndStatusID" resultType="com.eparking.eparking.domain.response.ResponseReservation">
+        SELECT
+        reserveID,
+        R.userID,
+        R.parkingID,
+        parkingName,
+        address,
+        pricing,
+        statusID,
+        startDateTime,
+        endDatetime,
+        R.carID,
+        licensePlate
+        FROM Reservation R,Parking P, User U,CarDetail C
+        WHERE R.parkingID = P.parkingID
+        AND R.carID = C.carID
+        AND R.userID = #{userID}
+        AND R.userID = U.userID
+        AND R.statusID = #{statusID}
+        ORDER BY R.startDateTime DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="getResponseReservationByReservationID" resultType="com.eparking.eparking.domain.response.ResponseReservation">
+        SELECT
+        reserveID,
+        R.userID,
+        R.parkingID,
+        parkingName,
+        address,
+        pricing,
+        statusID,
+        startDateTime,
+        endDatetime,
+        R.carID,
+        licensePlate,
+        R.totalPrice
+        FROM Reservation R,Parking P, User U,CarDetail C
+        WHERE R.parkingID = P.parkingID
+        AND R.carID = C.carID
+        AND R.userID = U.userID
+        AND R.reserveID = #{reserveID}
+    </select>
+
+    <select id="getNumberOfListOrder" resultType="java.lang.Long">
+        SELECT COUNT(reserveID) FROM Reservation WHERE userID = #{userID} AND statusID = #{statusID}
+    </select>
+
+    <insert id="createReservation" parameterType="com.eparking.eparking.domain.response.ResponseReservation">
+        INSERT INTO Reservation (userID,parkingID, statusID, carID, startDateTime, endDatetime, totalPrice)
+        VALUES (#{userID}, #{requestReservation.parkingID}, #{requestReservation.statusID}, #{requestReservation.carID}, #{requestReservation.startDateTime}, #{requestReservation.endDatetime}, #{requestReservation.totalPrice});
+    </insert>
+
+    <select id="getNewlyInsertedReservation" resultType="com.eparking.eparking.domain.response.ResponseReservation">
+        SELECT
+        reserveID,
+        R.userID,
+        R.parkingID,
+        parkingName,
+        address,
+        pricing,
+        statusID,
+        startDateTime,
+        endDatetime,
+        R.carID,
+        licensePlate,
+        totalPrice
+        FROM
+        Reservation R
+        INNER JOIN Parking P ON R.parkingID = P.parkingID
+        INNER JOIN User U ON R.userID = U.userID
+        INNER JOIN CarDetail C ON R.carID = C.carID
+        WHERE
+        R.userID = #{userID}
+        AND R.reserveID = (
+        SELECT MAX(reserveID)
+        FROM Reservation
+        WHERE userID = R.userID)
+    </select>
+
+    <update id="updateStatus" parameterType="com.eparking.eparking.domain.response.ResponseReservation">
+        UPDATE Reservation
+        SET statusID = #{statusID}
+        WHERE reserveID = #{reserveID}
+    </update>
+
+    <select id="getOverlappingReservations" resultType="com.eparking.eparking.domain.response.ResponseReservation">
+        <![CDATA[
+  SELECT
+    reserveID,
+    R.userID,
+    R.parkingID,
+    parkingName,
+    address,
+    pricing,
+    statusID,
+    startDateTime,
+    endDatetime,
+    R.carID,
+    licensePlate,
+    R.totalPrice
+  FROM Reservation R
+  JOIN Parking P ON R.parkingID = P.parkingID
+  JOIN User U ON R.userID = U.userID
+  JOIN CarDetail C ON R.carID = C.carID
+  WHERE R.parkingID = #{parkingID}
+    AND (R.startDateTime <= #{endDateTime} AND R.endDatetime >= #{startDateTime})
+  ]]>
+    </select>
+
+
+
+</mapper>

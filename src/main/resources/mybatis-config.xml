@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+<mappers>
+
+    <mapper resource="mapper/UserMapper.xml"></mapper>
+
+    <mapper resource="mapper/RoleMapper.xml"></mapper>
+
+    <mapper resource="mapper/CarDetailMapper.xml"></mapper>
+
+    <mapper resource="mapper/ParkingMapper.xml"></mapper>
+
+    <mapper resource="mapper/DateMapper.xml"></mapper>
+
+    <mapper resource="mapper/SpecialDateMapper.xml"></mapper>
+
+    <mapper resource="mapper/CartMapper.xml"></mapper>
+
+    <mapper resource="mapper/ReservationMapper.xml"></mapper>
+
+    <mapper resource="mapper/RevenueMapper.xml"></mapper>
+
+    <mapper resource="mapper/PaymentMapper.xml"></mapper>
+
+</mappers>
+</configuration>

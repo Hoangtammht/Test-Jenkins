@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.CarDetailMapper">
+
+    <resultMap id = "resultCarDetail" type = "com.eparking.eparking.domain.CarDetail">
+        <result property = "carID" column = "carID"/>
+        <result property = "phoneNumber" column = "phoneNumber"/>
+        <result property = "licensePlate" column = "licensePlate"/>
+    </resultMap>
+
+    <resultMap id="responseCarInParkingMap" type="com.eparking.eparking.domain.response.ResponseCarInParking">
+        <result property="phoneNumber" column="phoneNumber" />
+        <result property="licensePlate" column="licensePlate" />
+        <result property="statusName" column="statusName" />
+        <result property="methodID" column="methodID" />
+        <result property="methodName" column="methodName" />
+        <result property="startDateTime" column="startDateTime" />
+        <result property="endDatetime" column="endDatetime" />
+        <result property="customerID" column="userID" />
+        <result property="pricing" column="pricing" />
+        <result property="totalPrice" column="totalPrice" />
+    </resultMap>
+
+    <resultMap id = "resultCarRe" type = "com.eparking.eparking.domain.CarDetail">
+        <result property = "carID" column = "carID"/>
+        <result property = "phoneNumber" column = "phoneNumber"/>
+        <result property = "licensePlate" column = "licensePlate"/>
+    </resultMap>
+
+
+    <select id="findCarDetailByUserID" resultType="com.eparking.eparking.domain.response.ResponseCarDetail">
+        SELECT
+            carID,
+            userID,
+            licensePlate
+        FROM CarDetail
+        where userID = #{userID};
+    </select>
+    <select id="findCarDetailByCarID" resultType="com.eparking.eparking.domain.response.ResponseCarDetail">
+        SELECT
+        carID,
+        userID,
+        licensePlate
+        FROM CarDetail
+        where carID = #{carID};
+    </select>
+    <select id="findCarResponselByUserID" resultMap="resultCarRe">
+        SELECT
+        carID,
+        licensePlate
+        FROM CarDetail
+        WHERE userID = #{userID};
+    </select>
+    <select id="getNewlyCar" resultType="com.eparking.eparking.domain.response.ResponseCarDetail">
+        SELECT
+        carID,
+        userID,
+        licensePlate
+        FROM CarDetail
+        WHERE carID = (SELECT LAST_INSERT_ID())
+    </select>
+
+
+    <insert id="addCar" useGeneratedKeys="true" keyProperty="carID" parameterType="com.eparking.eparking.domain.CarDetail" >
+        Insert into CarDetail (userID, licensePlate)
+        values (#{userID},#{licensePlate})
+    </insert>
+
+    <delete id = "removeCar" parameterType = "com.eparking.eparking.domain.CarDetail">
+        DELETE from CarDetail WHERE carID = #{carID};
+    </delete>
+
+    <select id="findCarsInParkingByStatus" resultMap="responseCarInParkingMap">
+        SELECT u.phoneNumber, cd.licensePlate, rs.statusName, m.methodID, m.methodName,
+        r.startDateTime, r.endDatetime, r.userID, p.pricing, r.totalPrice
+        FROM CarDetail cd
+        INNER JOIN Reservation r ON cd.carID = r.carID
+        INNER JOIN ReservationStatus rs ON r.statusID = rs.statusID
+        INNER JOIN Parking p ON r.parkingID = p.parkingID
+        INNER JOIN Method m ON m.methodID = p.methodID
+        INNER JOIN User u ON u.userID = cd.userID
+        WHERE rs.statusID = #{status} and p.parkingID = #{parkingID}
+        ORDER BY r.reserveID DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="getNumberOfReservationByStatus" resultType="java.lang.Long">
+        SELECT COUNT(reserveID) FROM Reservation WHERE statusID = #{status};
+    </select>
+
+</mapper>

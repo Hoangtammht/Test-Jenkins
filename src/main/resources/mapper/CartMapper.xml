@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.CartMapper">
+
+    <resultMap id = "ListCartMap" type = "com.eparking.eparking.domain.Cart">
+        <result property = "userID" column = "userID"/>
+        <result property = "reserveID" column = "reserveID"/>
+    </resultMap>
+
+    <select id="getListCartByUserID" resultMap="ListCartMap">
+        SELECT
+        userID, reserveID
+        FROM Cart
+        WHERE userID = #{userID}
+    </select>
+
+</mapper>

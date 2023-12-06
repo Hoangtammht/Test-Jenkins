@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.PaymentMapper">
+
+    <resultMap id="resultHistory" type="com.eparking.eparking.domain.response.ResponseHistoryPayment">
+        <result property="vnp_BankCode" column="vnp_BankCode"/>
+        <result property="vnp_Amount" column="vnp_Amount"/>
+        <result property="vnp_TxnRef" column="vnp_TxnRef"/>
+        <result property="paymentDatetime" column="paymentDateTime"/>
+    </resultMap>
+
+
+    <insert id="insertTransaction" parameterType="com.eparking.eparking.domain.resquest.TransactionData">
+        INSERT INTO PaymentDetail (userID, vnp_BankCode, vnp_Amount, vnp_TxnRef, paymentDateTime)
+        VALUES (#{userID}, #{bankCode}, #{vnp_Amount}, #{vnp_TxnRef}, #{paymentDateTime});
+    </insert>
+
+    <select id="getHistoryPayment" resultMap="resultHistory">
+        SELECT
+            vnp_BankCode,
+            vnp_Amount,
+            vnp_TxnRef,
+            paymentDateTime
+        FROM PaymentDetail
+        where userID = #{userID};
+    </select>
+    
+</mapper>

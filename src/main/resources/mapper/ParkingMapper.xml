@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.ParkingMapper">
+
+    <insert id="createParking" useGeneratedKeys="true" keyProperty="parking.parkingID" parameterType="com.eparking.eparking.domain.Parking">
+        INSERT INTO Parking (userID, methodID, parkingName, description, images, address, latitude, longitude, pricing, park, status)
+        VALUES (#{userID}, #{parking.methodID}, #{parking.parkingName}, #{parking.description}, #{parking.images}, #{parking.address}, #{parking.latitude}, #{parking.longitude}, #{parking.pricing}, #{parking.park}, "1");
+    </insert>
+
+    <select id="findParkingByParkingID" resultType="com.eparking.eparking.domain.response.ResponseParking">
+        SELECT
+            parkingID,
+            P.userID,
+            phoneNumber,
+            methodName,
+            parkingName,
+            description,
+            images,
+            address,
+            latitude,
+            longitude,
+            pricing,
+            park,
+            status
+        FROM Parking P, Method M, User U
+        where P.methodID = M.methodID
+        and U.userID = P.userID
+        and parkingID = #{parkingID};
+    </select>
+
+    <select id="getListParking" resultType="com.eparking.eparking.domain.response.ResponseParking">
+        SELECT
+            parkingID,
+            P.userID,
+            phoneNumber,
+            methodName,
+            parkingName,
+            description,
+            images,
+            address,
+            latitude,
+            longitude,
+            pricing,
+            park,
+            status
+        FROM Parking P, Method M, User U
+        WHERE P.userID = #{userID}
+        AND P.methodID = M.methodID
+        and U.userID = P.userID
+        ORDER BY parkingID
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="getNumberOfParkings" resultType="java.lang.Long">
+        SELECT COUNT(parkingID) FROM Parking Where park >= 1
+    </select>
+
+    <insert id="addDatesForParking" parameterType="java.util.List">
+        INSERT INTO ParkingDate(dateOfWeekID, parkingID, offerDate)
+        VALUES
+        <foreach item="parkingDate" collection="list" separator=",">
+            (#{parkingDate.dateOfWeekID}, #{parkingDate.parkingID}, #{parkingDate.offerDate})
+        </foreach>
+    </insert>
+
+    <insert id="addSpecialDatesForParking" parameterType="java.util.List">
+        INSERT INTO ParkingSpecialDate (specialDateID, parkingID, offerSpecialDate)
+        VALUES
+        <foreach item="parkingSpecialDate" collection="list" separator=",">
+            (#{parkingSpecialDate.specialDateID}, #{parkingSpecialDate.parkingID}, #{parkingSpecialDate.offerSpecialDate})
+        </foreach>
+    </insert>
+
+    <select id="showDatesOfParking" resultType="com.eparking.eparking.domain.ParkingDate">
+        SELECT
+            dateOfWeekID,
+            parkingID,
+            offerDate
+        FROM ParkingDate
+            where parkingID = #{parkingID};
+    </select>
+
+    <insert id="createSpecialDate" useGeneratedKeys="true" keyProperty="specialDateID" parameterType="com.eparking.eparking.domain.SpecialDate">
+        INSERT INTO SpecialDate (specialDateID, startSpecialDate, endSpecialDate)
+        VALUES (#{specialDateID}, #{startSpecialDate}, #{endSpecialDate});
+    </insert>
+
+    <select id="searchNearbyParking" resultType="com.eparking.eparking.domain.response.ResponseParking">
+        <![CDATA[
+        SELECT
+        parkingID,
+        P.userID,
+        phoneNumber,
+        methodName,
+        parkingName,
+        description,
+        images,
+        address,
+        latitude,
+        longitude,
+        pricing,
+        park,
+        status,
+        6371 * 2 * ASIN(SQRT(POWER(SIN((#{latitude} - ABS(latitude)) * PI()/180/2), 2) + COS(#{latitude} * PI()/180) * COS(ABS(latitude) * PI()/180) * POWER(SIN((#{longitude} - longitude) * PI()/180/2), 2))) AS distance
+    FROM Parking P, Method M, User U
+    WHERE P.methodID = M.methodID
+        AND U.userID = P.userID
+        AND 6371 * 2 * ASIN(SQRT(POWER(SIN((#{latitude} - ABS(latitude))) * PI()/180/2, 2) + COS(#{latitude} * PI()/180) * COS(ABS(latitude) * PI()/180) * POWER(SIN((#{longitude} - longitude) * PI()/180/2), 2))) < #{radius}
+        AND P.park >= 1
+    ORDER BY
+        CASE
+             WHEN #{sortBy} = 'cheapest' THEN pricing
+             WHEN #{sortBy} = 'nearest' THEN distance
+             WHEN #{sortBy} = 'cheapest_nearest' THEN pricing
+             ELSE distance
+         END ASC,
+         distance ASC
+    LIMIT #{size} OFFSET #{offset}
+    ]]>
+    </select>
+
+    <select id="getListParkingByUserID" resultType="com.eparking.eparking.domain.response.ResponseParking">
+        SELECT
+        parkingID,
+        P.userID,
+        phoneNumber,
+        methodName,
+        parkingName,
+        description,
+        images,
+        address,
+        latitude,
+        longitude,
+        pricing,
+        park,
+        status
+        FROM Parking P, Method M, User U
+        WHERE P.methodID = M.methodID
+        AND P.userID = #{userID}
+        AND U.userID = P.userID
+    </select>
+
+    <update id="updateParkForParking" parameterType="com.eparking.eparking.domain.Parking">
+        UPDATE Parking
+        SET park = #{park}
+        WHERE parkingID = #{parkingID}
+    </update>
+
+    <update id="updatePricingByParkingID" parameterType="com.eparking.eparking.domain.Parking">
+        UPDATE Parking
+        SET pricing = #{pricing}
+        WHERE parkingID = #{parkingID}
+    </update>
+
+</mapper>

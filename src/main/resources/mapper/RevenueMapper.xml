@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eparking.eparking.dao.RevenueMapper">
+
+    <select id="calculateParkingRevenueToday" resultType="double">
+        SELECT COALESCE(SUM(totalPrice), 0.0) AS revenue
+        FROM Reservation
+        WHERE parkingID = #{parkingID}
+        AND statusID = 3
+        AND DATE(startDateTime) = CURDATE();
+    </select>
+
+    <select id="getListParkingTodayOfUserID" resultType="com.eparking.eparking.domain.response.ResponseParking">
+        SELECT
+        p.parkingID,
+        p.userID,
+        u.phoneNumber,
+        methodName,
+        parkingName,
+        description,
+        images,
+        address,
+        latitude,
+        longitude,
+        pricing,
+        park,
+        status
+        FROM Parking p
+        INNER JOIN Reservation r ON p.parkingID = r.parkingID
+        INNER JOIN User u ON p.userID = u.userID
+        INNER JOIN Method m ON p.methodID = m.methodID
+        WHERE p.userID = #{userID}
+        AND statusID = 3
+        AND DATE(r.startDateTime) = CURDATE();
+    </select>
+
+    <select id="calculateParkingRevenueDurationTime" resultType="double">
+        SELECT COALESCE(SUM(totalPrice), 0.0) AS revenue
+        FROM Reservation
+        WHERE parkingID = #{parkingID}
+        AND statusID = 3
+        AND startDateTime BETWEEN #{from} AND #{to}
+    </select>
+
+    <select id="getListParkingDurationTimeOfUserID" resultType="com.eparking.eparking.domain.response.ResponseParking">
+        SELECT
+        p.parkingID,
+        p.userID,
+        u.phoneNumber,
+        methodName,
+        parkingName,
+        description,
+        images,
+        address,
+        latitude,
+        longitude,
+        pricing,
+        park,
+        status
+        FROM Parking p
+        INNER JOIN Reservation r ON p.parkingID = r.parkingID
+        INNER JOIN User u ON p.userID = u.userID
+        INNER JOIN Method m ON p.methodID = m.methodID
+        WHERE p.userID = #{userID}
+        AND startDateTime BETWEEN #{from} AND #{to}
+    </select>
+
+</mapper>
