@@ -22,8 +22,8 @@ pipeline {
 
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                    sh 'docker build -t hoangtammhtdinh/springboot .'
-                    sh 'docker push hoangtammhtdinh/springboot'
+                    sh 'docker build -t hoangtammht/springboot .'
+                    sh 'docker push hoangtammht/springboot'
                 }
             }
         }
@@ -46,12 +46,12 @@ pipeline {
         stage('Deploy Spring Boot to DEV') {
             steps {
                 echo 'Deploying and cleaning'
-                sh 'docker image pull hoangtammhtdinh/springboot'
+                sh 'docker image pull hoangtammht/springboot'
                 sh 'docker container stop hoangtammht-springboot || echo "this container does not exist" '
                 sh 'docker network create dev || echo "this network exists"'
                 sh 'echo y | docker container prune '
 
-                sh 'docker container run -d --rm --name hoangtammht-springboot -p 8081:8080 --network dev hoangtammhtdinh/springboot'
+                sh 'docker container run -d --rm --name hoangtammht-springboot -p 8081:8080 --network dev hoangtammht/springboot'
             }
         }
  
