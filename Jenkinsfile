@@ -19,13 +19,13 @@ pipeline {
         }
 
         stage('Packaging/Pushing imagae') {
-            steps {
-                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1') {
-                    sh 'docker build -t hoangtammht/exeproject .'
-                    sh 'docker push hoangtammht/exeproject'
+                    steps {
+                        withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+                            sh 'docker build -t hoangtammht/exeproject .'
+                            sh 'docker push hoangtammht/exeproject'
+                        }
+                    }
                 }
-            }
-        }
 
         stage('Deploy MySQL to DEV') {
             steps {
