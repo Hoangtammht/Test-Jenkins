@@ -19,15 +19,18 @@ pipeline {
             }
         }
 
-        stage('Push image to Hub'){
-                    steps{
-                        script{
-                           withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-                           sh 'docker login -u hoangtammht -p ${dockerhub}'
-                           sh 'docker push hoangtammht/devops-integration'
-                        }
-                    }
+        stage('Packaging/Pushing imagae') {
+
+            steps {
+                script{
+                                   withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                                   sh 'docker login -u hoangtammht -p ${dockerhub}'
+
                 }
+                                   sh 'docker push hoangtammht/devops-integration'
+                                }
+            }
+        }
 
         stage('Deploy MySQL to DEV') {
             steps {
