@@ -22,13 +22,12 @@ pipeline {
         stage('Packaging/Pushing image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
-                        sh 'docker push hoangtammht/devops-integration'
-                    }
+                    sh "docker login -u hoangtammht -p Hoangtam39"
+                    sh 'docker push hoangtammht/devops-integration'
                 }
             }
         }
+
 
         stage('Deploy MySQL to DEV') {
             steps {
