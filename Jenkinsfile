@@ -5,10 +5,10 @@ pipeline {
     tools {
         maven 'my-maven'
     }
-    environment {
-        MYSQL_ROOT_LOGIN = credentials('mysql-root-login')
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-    }
+//     environment {
+//         MYSQL_ROOT_LOGIN = credentials('mysql-root-login')
+//         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+//     }
     stages {
 
         stage('Build with Maven') {
