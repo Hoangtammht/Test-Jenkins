@@ -19,14 +19,16 @@ pipeline {
             }
         }
 
-        stage('Packaging/Pushing imagae') {
-            steps {
-                withDockerRegistry([ credentialsId: "dockerhub", url: "https://registry.hub.docker.com" ]) {
-                    sh 'docker build -t hoangtammht/springboot .'
-                    sh 'docker push hoangtammht/springboot'
-                }
-            }
+        stage('Push image to Hub'){
+                    steps{
+                        script{
+                           withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                           sh 'docker login -u hoangtammht -p Hoangtam39'
         }
+                           sh 'docker push hoangtammht/devops-integration'
+                        }
+                    }
+                }
 
         stage('Deploy MySQL to DEV') {
             steps {
