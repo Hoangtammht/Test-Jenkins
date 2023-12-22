@@ -1,16 +1,16 @@
 pipeline {
+
     agent any
 
     tools {
         maven 'my-maven'
     }
-
     environment {
         MYSQL_ROOT_LOGIN = credentials('mysql-root-login')
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
-
     stages {
+
         stage('Build with Maven') {
             steps {
                 sh 'mvn --version'
@@ -19,15 +19,14 @@ pipeline {
             }
         }
 
-        stage('Packaging/Pushing image') {
+        stage('Packaging/Pushing imagae') {
             steps {
-                script {
-                    sh "docker login -u hoangtammht -p Hoangtam39"
-                    sh 'docker push hoangtammht/devops-integration'
+                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+                    sh 'docker build -t hoangtammht/springboot .'
+                    sh 'docker push hoangtammht/springboot'
                 }
             }
         }
-
 
         stage('Deploy MySQL to DEV') {
             steps {
@@ -38,9 +37,9 @@ pipeline {
                 sh 'echo y | docker container prune '
                 sh 'docker volume rm hoangtammht-mysql-data || echo "no volume"'
 
-                sh "docker run --name hoangtammht-mysql --rm --network dev -v hoangtammht-mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_LOGIN} -e MYSQL_DATABASE=db_example -d mysql:8.0 "
+                sh "docker run --name hoangtammht-mysql --rm --network dev -v hoangtammht-mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_LOGIN_PSW} -e MYSQL_DATABASE=db_example  -d mysql:8.0 "
                 sh 'sleep 20'
-                sh "docker exec -i hoangtammht-mysql mysql --user=root --password=${MYSQL_ROOT_LOGIN} < script"
+                sh "docker exec -i hoangtammht-mysql mysql --user=root --password=${MYSQL_ROOT_LOGIN_PSW} < script"
             }
         }
 
@@ -55,9 +54,10 @@ pipeline {
                 sh 'docker container run -d --rm --name hoangtammht-springboot -p 8081:8080 --network dev hoangtammht/springboot'
             }
         }
-    }
 
+    }
     post {
+        // Clean after build
         always {
             cleanWs()
         }
