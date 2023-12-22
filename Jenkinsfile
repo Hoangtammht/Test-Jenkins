@@ -7,6 +7,7 @@ pipeline {
     }
     environment {
         MYSQL_ROOT_LOGIN = credentials('mysql-root-login')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
     stages {
 
@@ -21,9 +22,9 @@ pipeline {
         stage('Packaging/Pushing imagae') {
 
             steps {
-                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                    sh 'sudo docker build -t hoangtammht/springboot .'
-                    sh 'sudo docker push hoangtammht/springboot'
+                withDockerRegistry(credentialsId: 'dockerhub') {
+                    sh 'docker build -t hoangtammht/springboot .'
+                    sh 'docker push hoangtammht/springboot'
                 }
             }
         }
